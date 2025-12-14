@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import PriceCalculator from '@/components/PriceCalculator';
 
 const Index = () => {
   const { toast } = useToast();
@@ -17,21 +18,52 @@ const Index = () => {
     format: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Заявка отправлена!",
-      description: "Мы свяжемся с вами в ближайшее время.",
-    });
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      product: '',
-      format: '',
-      message: ''
-    });
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/a69d3cdb-dac0-4dfa-99ca-c2388b9566e5', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Заявка отправлена!",
+          description: "Мы свяжемся с вами в ближайшее время.",
+        });
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          product: '',
+          format: '',
+          message: ''
+        });
+      } else {
+        toast({
+          title: "Ошибка отправки",
+          description: data.error || "Попробуйте позже",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка подключения",
+        description: "Проверьте интернет-соединение",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const products = [
@@ -134,6 +166,85 @@ const Index = () => {
         </div>
       </section>
 
+      <section className="py-20 bg-gradient-to-br from-primary/5 via-secondary/5 to-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16 animate-fade-in">
+            <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Наши преимущества
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Почему более 500 клиентов выбирают именно нас
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-background rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-scale-in border-2">
+              <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mb-4">
+                <Icon name="Zap" size={28} className="text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Быстрое производство</h3>
+              <p className="text-muted-foreground">Печать готова за 24 часа. Срочные заказы — за 6 часов.</p>
+            </div>
+
+            <div className="bg-background rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-scale-in border-2" style={{ animationDelay: '0.1s' }}>
+              <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mb-4">
+                <Icon name="Award" size={28} className="text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Премиум качество</h3>
+              <p className="text-muted-foreground">Профессиональное оборудование и материалы высочайшего качества.</p>
+            </div>
+
+            <div className="bg-background rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-scale-in border-2" style={{ animationDelay: '0.2s' }}>
+              <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mb-4">
+                <Icon name="ShieldCheck" size={28} className="text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Гарантия качества</h3>
+              <p className="text-muted-foreground">Бесплатная переделка, если результат вас не устроит.</p>
+            </div>
+
+            <div className="bg-background rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-scale-in border-2" style={{ animationDelay: '0.3s' }}>
+              <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mb-4">
+                <Icon name="Truck" size={28} className="text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Доставка по России</h3>
+              <p className="text-muted-foreground">Быстрая доставка курьером или почтой в любой город.</p>
+            </div>
+
+            <div className="bg-background rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-scale-in border-2" style={{ animationDelay: '0.4s' }}>
+              <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mb-4">
+                <Icon name="Palette" size={28} className="text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Индивидуальный дизайн</h3>
+              <p className="text-muted-foreground">Помощь дизайнера в создании уникального макета бесплатно.</p>
+            </div>
+
+            <div className="bg-background rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-scale-in border-2" style={{ animationDelay: '0.5s' }}>
+              <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mb-4">
+                <Icon name="Percent" size={28} className="text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Выгодные цены</h3>
+              <p className="text-muted-foreground">Скидки от 5 штук. Оптовым клиентам — специальные условия.</p>
+            </div>
+
+            <div className="bg-background rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-scale-in border-2" style={{ animationDelay: '0.6s' }}>
+              <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mb-4">
+                <Icon name="FileCheck" size={28} className="text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Любые форматы</h3>
+              <p className="text-muted-foreground">Принимаем файлы JPG, PNG, AI, PSD — поможем с подготовкой.</p>
+            </div>
+
+            <div className="bg-background rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-scale-in border-2" style={{ animationDelay: '0.7s' }}>
+              <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mb-4">
+                <Icon name="Headphones" size={28} className="text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Поддержка 24/7</h3>
+              <p className="text-muted-foreground">Отвечаем на вопросы круглосуточно по телефону и в мессенджерах.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="services" className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 animate-fade-in">
@@ -211,17 +322,20 @@ const Index = () => {
       </section>
 
       <section id="order" className="py-20 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5">
-        <div className="container mx-auto px-4 max-w-3xl">
+        <div className="container mx-auto px-4">
           <div className="text-center mb-12 animate-fade-in">
             <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Оформить заказ
             </h2>
             <p className="text-xl text-muted-foreground">
-              Заполните форму, и мы свяжемся с вами в ближайшее время
+              Рассчитайте стоимость или заполните форму для заказа
             </p>
           </div>
 
-          <Card className="shadow-2xl border-2 animate-scale-in">
+          <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            <PriceCalculator />
+
+            <Card className="shadow-2xl border-2 animate-scale-in">
             <CardContent className="pt-6">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
@@ -299,13 +413,14 @@ const Index = () => {
                   />
                 </div>
 
-                <Button type="submit" size="lg" className="w-full text-lg py-6 shadow-lg hover:shadow-xl">
-                  Отправить заявку
+                <Button type="submit" size="lg" className="w-full text-lg py-6 shadow-lg hover:shadow-xl" disabled={isSubmitting}>
+                  {isSubmitting ? 'Отправляем...' : 'Отправить заявку'}
                   <Icon name="Send" className="ml-2" size={20} />
                 </Button>
               </form>
             </CardContent>
           </Card>
+          </div>
         </div>
       </section>
 
